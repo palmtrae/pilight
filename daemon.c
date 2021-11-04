@@ -844,16 +844,18 @@ void *send_code(void *param) {
 					json_append_member(message, "repeat", json_mknumber(1, 0));
 				}
 			}
+			bool shouldSend = true;
 			if(sendqueue->settings != NULL && strcmp(sendqueue->settings, "{}") != 0) {
 				if(json_validate(sendqueue->settings) == true) {
 					if(message == NULL) {
 						message = json_mkobject();
 					}
-					json_append_member(message, "settings", json_decode(sendqueue->settings));
+					struct JsonNode *settings = json_decode(sendqueue->settings)
+					shouldSend = json_find_member(settings, "noTx") == NULL;
+					json_append_member(message, "settings", settings);
 				}
 			}
-
-			if(protocol->hwtype == RF433 || protocol->hwtype == RF868) {
+			if(shouldSend && (protocol->hwtype == RF433 || protocol->hwtype == RF868)) {
 				logprintf(LOG_DEBUG, "**** RAW CODE ****");
 				if(log_level_get() >= LOG_DEBUG) {
 					for(i=0;i<sendqueue->length;i++) {
