@@ -230,6 +230,7 @@ static void printHelp(void) {
 	printf("\t -i --id=id\t\t\tcontrol a device with this id\n");
 	printf("\t -a --all\t\t\tsend command to all devices with this id\n");
 	printf("\t -l --learn\t\t\tsend multiple streams so switch can learn\n");
+	printf("\t -s --state_only\t\t\tset the device state only, without radio\n");
 }
 
 #if !defined(MODULE) && !defined(_WIN32)
@@ -257,7 +258,7 @@ void arctechSwitchInit(void) {
 	options_add(&arctech_switch->options, "i", "id", OPTION_HAS_VALUE, DEVICES_ID, JSON_NUMBER, NULL, "^([0-9]{1,7}|[1-5][0-9]{7}|6([0-6][0-9]{6}|7(0[0-9]{5}|10([0-7][0-9]{3}|8([0-7][0-9]{2}|8([0-5][0-9]|6[0-3]))))))$");
 	options_add(&arctech_switch->options, "a", "all", OPTION_OPT_VALUE, DEVICES_OPTIONAL, JSON_NUMBER, NULL, NULL);
 	options_add(&arctech_switch->options, "l", "learn", OPTION_NO_VALUE, DEVICES_OPTIONAL, JSON_NUMBER, NULL, NULL);
-
+	options_add(&arctech_switch->options, "s", "state_only", OPTION_NO_VALUE, DEVICES_OPTIONAL, JSON_NUMBER, NULL, NULL);
 	options_add(&arctech_switch->options, "0", "readonly", OPTION_HAS_VALUE, GUI_SETTING, JSON_NUMBER, (void *)0, "^[10]{1}$");
 	options_add(&arctech_switch->options, "0", "confirm", OPTION_HAS_VALUE, GUI_SETTING, JSON_NUMBER, (void *)0, "^[10]{1}$");
 
