@@ -850,7 +850,7 @@ void *send_code(void *param) {
 					if(message == NULL) {
 						message = json_mkobject();
 					}
-					struct JsonNode *settings = json_decode(sendqueue->settings)
+					struct JsonNode *settings = json_decode(sendqueue->settings);
 					shouldSend = json_find_member(settings, "noTx") == NULL;
 					json_append_member(message, "settings", settings);
 				}
