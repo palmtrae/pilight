@@ -50,7 +50,7 @@ static int validate(void) {
 	return -1;
 }
 
-static void createMessage(int id, int unit, int state, int all, int learn) {
+static void createMessage(int id, int unit, int state, int all, int learn, int noradio) {
 	arctech_switch->message = json_mkobject();
 
 	json_append_member(arctech_switch->message, "id", json_mknumber(id, 0));
@@ -71,6 +71,10 @@ static void createMessage(int id, int unit, int state, int all, int learn) {
 		arctech_switch->txrpt = LEARN_REPEATS;
 	} else {
 		arctech_switch->txrpt = NORMAL_REPEATS;
+	}
+
+	if (noradio == 1) {
+		json_append_member(arctech_switch->message, "noradio", json_mknumber(nosend, 0));
 	}
 }
 
@@ -95,7 +99,7 @@ static void parseCode(void) {
 	int all = binary[26];
 	int id = binToDecRev(binary, 0, 25);
 
-	createMessage(id, unit, state, all, 0);
+	createMessage(id, unit, state, all, 0, 0);
 }
 
 static void createLow(int s, int e) {
@@ -179,6 +183,7 @@ static int createCode(struct JsonNode *code) {
 	int state = -1;
 	int all = 0;
 	int learn = -1;
+	int noradio = -1;
 	double itmp = -1;
 
 	if(json_find_number(code, "id", &itmp) == 0)
@@ -193,6 +198,8 @@ static int createCode(struct JsonNode *code) {
 		state=1;
 	if(json_find_number(code, "learn", &itmp) == 0)
 		learn = 1;
+	if(json_find_number(code, "noradio", &itmp) == 0)
+		noradio = 1;
 
 	if(all > 0 && learn > -1) {
 		logprintf(LOG_ERR, "arctech_switch: all and learn cannot be combined");
@@ -210,7 +217,7 @@ static int createCode(struct JsonNode *code) {
 		if(unit == -1 && all == 1) {
 			unit = 0;
 		}
-		createMessage(id, unit, state, all, learn);
+		createMessage(id, unit, state, all, learn, noradio);
 		createStart();
 		clearCode();
 		createId(id);
@@ -230,7 +237,7 @@ static void printHelp(void) {
 	printf("\t -i --id=id\t\t\tcontrol a device with this id\n");
 	printf("\t -a --all\t\t\tsend command to all devices with this id\n");
 	printf("\t -l --learn\t\t\tsend multiple streams so switch can learn\n");
-	printf("\t -s --state_only\t\t\tset the device state only, without radio\n");
+	printf("\t -n --noradio\t\t\tset the device state only, without radio\n");
 }
 
 #if !defined(MODULE) && !defined(_WIN32)
@@ -258,7 +265,7 @@ void arctechSwitchInit(void) {
 	options_add(&arctech_switch->options, "i", "id", OPTION_HAS_VALUE, DEVICES_ID, JSON_NUMBER, NULL, "^([0-9]{1,7}|[1-5][0-9]{7}|6([0-6][0-9]{6}|7(0[0-9]{5}|10([0-7][0-9]{3}|8([0-7][0-9]{2}|8([0-5][0-9]|6[0-3]))))))$");
 	options_add(&arctech_switch->options, "a", "all", OPTION_OPT_VALUE, DEVICES_OPTIONAL, JSON_NUMBER, NULL, NULL);
 	options_add(&arctech_switch->options, "l", "learn", OPTION_NO_VALUE, DEVICES_OPTIONAL, JSON_NUMBER, NULL, NULL);
-	options_add(&arctech_switch->options, "s", "state_only", OPTION_NO_VALUE, DEVICES_OPTIONAL, JSON_NUMBER, NULL, NULL);
+	options_add(&arctech_switch->options, "n", "noradio", OPTION_NO_VALUE, DEVICES_OPTIONAL, JSON_NUMBER, NULL, NULL);
 	options_add(&arctech_switch->options, "0", "readonly", OPTION_HAS_VALUE, GUI_SETTING, JSON_NUMBER, (void *)0, "^[10]{1}$");
 	options_add(&arctech_switch->options, "0", "confirm", OPTION_HAS_VALUE, GUI_SETTING, JSON_NUMBER, (void *)0, "^[10]{1}$");
 

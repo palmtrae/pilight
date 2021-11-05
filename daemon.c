@@ -829,30 +829,31 @@ void *send_code(void *param) {
 			struct protocol_t *protocol = sendqueue->protopt;
 
 			struct JsonNode *message = NULL;
+			
+			bool shouldSend = true;
 
 			if(sendqueue->message != NULL && strcmp(sendqueue->message, "{}") != 0) {
 				if(json_validate(sendqueue->message) == true) {
 					if(message == NULL) {
 						message = json_mkobject();
 					}
+					struct JsonNode *qmessage = json_decode(sendqueue->message);
 					json_append_member(message, "origin", json_mkstring("sender"));
 					json_append_member(message, "protocol", json_mkstring(protocol->id));
-					json_append_member(message, "message", json_decode(sendqueue->message));
+					json_append_member(message, "message", qmessage);
 					if(strlen(sendqueue->uuid) > 0) {
 						json_append_member(message, "uuid", json_mkstring(sendqueue->uuid));
 					}
 					json_append_member(message, "repeat", json_mknumber(1, 0));
+					shouldSend = json_find_member(qmessage, "noradio") == NULL;
 				}
 			}
-			bool shouldSend = true;
 			if(sendqueue->settings != NULL && strcmp(sendqueue->settings, "{}") != 0) {
 				if(json_validate(sendqueue->settings) == true) {
 					if(message == NULL) {
 						message = json_mkobject();
 					}
-					struct JsonNode *settings = json_decode(sendqueue->settings);
-					shouldSend = json_find_member(settings, "state_only") == NULL;
-					json_append_member(message, "settings", settings);
+					json_append_member(message, "settings", json_decode(sendqueue->settings));
 				}
 			}
 			if(shouldSend && (protocol->hwtype == RF433 || protocol->hwtype == RF868)) {
