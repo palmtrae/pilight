@@ -74,7 +74,7 @@ static void createMessage(int id, int unit, int state, int all, int learn, int n
 	}
 
 	if (noradio == 1) {
-		json_append_member(arctech_switch->message, "noradio", json_mknumber(nosend, 0));
+		json_append_member(arctech_switch->message, "noradio", json_mknumber(noradio, 0));
 	}
 }
 
