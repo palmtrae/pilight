@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 2.8.12)
 
 include(CMakeConfig.txt)
 
@@ -172,7 +172,7 @@ if(${MODULESPACK} MATCHES "ON" AND NOT WIN32)
 endif()
 
 if(NOT WIN32)
-	if(${PROTOCOL_ARPING} MATCHES "ON" AND NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^aarch64")
+	if(${PROTOCOL_ARPING} MATCHES "ON")
 		set(CMAKE_PCAP_LIBS_INIT)
 
 		find_library(CMAKE_PCAP_LIBS_INIT
